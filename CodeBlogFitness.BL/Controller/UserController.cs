@@ -48,11 +48,8 @@ namespace CodeBlogFitness.BL.Controller {
             CurrentUser.BirthDate = birthDate;
             CurrentUser.Height = height;
             CurrentUser.Weight = weight;
+            Save();
         }
-        //public UserController(string userName, string genderName, DateTime birthDate, double weight, double height) {
-        //    Gender gender = new Gender(genderName);
-        //    Users = new User(userName, gender, birthDate, weight, height);
-        //}
 
         /// <summary>
         /// Load users list from file
