@@ -13,7 +13,9 @@ namespace CodeBlogFitness.BL.Controller {
     /// <summary>
     /// User controller
     /// </summary>
-    public class UserController {
+    public class UserController : ControllerBase {
+
+        private const string USERS_FILE_NAME = "users.dat";
 
         /// <summary>
         /// Users list
@@ -56,29 +58,14 @@ namespace CodeBlogFitness.BL.Controller {
         /// </summary>
         /// <returns></returns>
         private List<User> GetUsersData() {
-            BinaryFormatter formatter = new BinaryFormatter();
-            using (var fs = new FileStream("users.dat", FileMode.OpenOrCreate)) {
-                try {
-                    if (formatter.Deserialize(fs) is List<User> users) {
-                        return users;
-                    }
-                }
-                catch (SerializationException) { }
-                catch (Exception exc) {
-                    Console.WriteLine($"   ERROR: {exc.Message};\n{exc}");
-                }
-            }
-            return null;
+            return base.Load<List<User>>(USERS_FILE_NAME);
         }
 
         /// <summary>
         /// Save user to file
         /// </summary>
         public void Save() {
-            BinaryFormatter formatter = new BinaryFormatter();
-            using (var fs = new FileStream("users.dat", FileMode.OpenOrCreate)) {
-                formatter.Serialize(fs, Users);
-            }
+            base.Save(USERS_FILE_NAME, Users);
         }
 
     }

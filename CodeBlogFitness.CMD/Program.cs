@@ -1,4 +1,5 @@
 ﻿using CodeBlogFitness.BL.Controller;
+using CodeBlogFitness.BL.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,7 +23,8 @@ namespace CodeBlogFitness.CMD {
             //TODO: Check user name
 
             //var userController = new UserController(name, gender, birthDate, weight, height);
-            var userController = new UserController(name);
+            UserController userController = new UserController(name);
+            EatingController eatingController = new EatingController(userController.CurrentUser);
             if (userController.IsNewUser) {
                 Console.Write("Enter user gender: ");
                 string gender = Console.ReadLine();
@@ -32,7 +34,33 @@ namespace CodeBlogFitness.CMD {
                 userController.SetNewUserData(gender, birthDate, weight, height);
             }
             Console.WriteLine(userController.CurrentUser);
+            Console.WriteLine("What do you want to do?");
+            Console.WriteLine("E - enter eating.");
+            var key = Console.ReadKey();
+            Console.WriteLine();
+            if (key.Key == ConsoleKey.E) {
+                var (food, weight) = EnterEating();
+                eatingController.Add(food, weight);
+
+                foreach (var item in eatingController.Eating.Foods) {
+                    Console.WriteLine($"\t{item.Key} - {item.Value}");
+                }
+            }
         }
+
+        private (Food, double) EnterEating() {
+            Console.Write("Enter food name: ");
+            var foodName = Console.ReadLine();
+            double calories = EnterNumberPlease("calories");
+            double proteins = EnterNumberPlease("proteins");
+            double fats = EnterNumberPlease("fats");
+            double carbohydrates = EnterNumberPlease("carbohydrates");
+            double foodWeight = EnterNumberPlease("dish weight");
+            return (new Food(foodName, proteins, fats, carbohydrates, calories), foodWeight);
+        }
+
+
+
 
         private static DateTime EnterDateTimePlease(string name) {
             while (true) {
