@@ -18,11 +18,11 @@ namespace CodeBlogFitness.BL.Model {
         /// <summary>
         /// User gender
         /// </summary>
-        public Gender Gender { get; }
+        public Gender Gender { get; set; }
         /// <summary>
         /// User birth date
         /// </summary>
-        public DateTime BirthDate { get; }
+        public DateTime BirthDate { get; set; }
         /// <summary>
         /// User weigth (kilograms)
         /// </summary>
@@ -31,7 +31,26 @@ namespace CodeBlogFitness.BL.Model {
         /// User height (centimeters)
         /// </summary>
         public double Height { get; set; }
+        /// <summary>
+        /// Age, calculated
+        /// </summary>
+        public int Age {
+            get {
+                DateTime today = DateTime.Today;
+                int age = today.Year - BirthDate.Year;
+                if (BirthDate > today.AddYears(-age))
+                    age--;
+                return age;
+            }
+        }
         #endregion
+
+        public User(string name) {
+            if (string.IsNullOrEmpty(name)) {
+                throw new ArgumentNullException("User name cannot be null or empty.", nameof(name));
+            }
+            Name = name;
+        }
 
         public User(    string name, 
                         Gender gender, 
@@ -40,10 +59,10 @@ namespace CodeBlogFitness.BL.Model {
                         double height) {
             #region Check arguments
             if (string.IsNullOrEmpty(name)) {
-                throw new ArgumentNullException("User name cannot be null or empty.");
+                throw new ArgumentNullException("User name cannot be null or empty.", nameof(name));
             }
-            if (gender == null) {
-                throw new ArgumentNullException("User gender cannot be null.");
+            if (gender is null) {
+                throw new ArgumentNullException("User gender cannot be null.", nameof(gender));
             }
             if (birthDate < DateTime.Parse("1900-01-01")) {
                 throw new ArgumentException("User birth date cannot be earlier than 1900-01-01.", nameof(birthDate));
@@ -66,7 +85,7 @@ namespace CodeBlogFitness.BL.Model {
         }
 
         public override string ToString() {
-            return Name;
+            return $"{Name} (age {Age})";
         }
     }
 }

@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,12 +16,62 @@ namespace CodeBlogFitness.BL.Controller {
     public class UserController {
 
         /// <summary>
-        /// User
+        /// Users list
         /// </summary>
-        public User User { get; }
+        public List<User> Users { get; }
+        /// <summary>
+        /// Current user
+        /// </summary>
+        public User CurrentUser { get; }
 
-        public UserController(User user) {
-            User = user ?? throw new ArgumentNullException("User cannot be null.", nameof(user));
+        public bool IsNewUser { get; } = false;
+        //public UserController(User user) {
+        //    Users = user ?? throw new ArgumentNullException("User cannot be null.", nameof(user));
+        //}
+
+        public UserController(string userName) {
+            if (string.IsNullOrWhiteSpace(userName)) {
+                throw new ArgumentNullException("User name cannot be null or empty.", nameof(userName));
+            }
+            Users = GetUsersData() ?? new List<User>();
+            CurrentUser = Users.SingleOrDefault(x => x.Name == userName);
+            if (CurrentUser is null) {
+                CurrentUser = new User(userName);
+                Users.Add(CurrentUser);
+                IsNewUser = true;
+                Save();
+            }
+        }
+
+        public void SetNewUserData(string genderName, DateTime birthDate, double weight = 70, double height = 150) {
+            CurrentUser.Gender = new Gender(genderName);
+            CurrentUser.BirthDate = birthDate;
+            CurrentUser.Height = height;
+            CurrentUser.Weight = weight;
+        }
+        //public UserController(string userName, string genderName, DateTime birthDate, double weight, double height) {
+        //    Gender gender = new Gender(genderName);
+        //    Users = new User(userName, gender, birthDate, weight, height);
+        //}
+
+        /// <summary>
+        /// Load users list from file
+        /// </summary>
+        /// <returns></returns>
+        private List<User> GetUsersData() {
+            BinaryFormatter formatter = new BinaryFormatter();
+            using (var fs = new FileStream("users.dat", FileMode.OpenOrCreate)) {
+                try {
+                    if (formatter.Deserialize(fs) is List<User> users) {
+                        return users;
+                    }
+                }
+                catch (SerializationException) { }
+                catch (Exception exc) {
+                    Console.WriteLine($"   ERROR: {exc.Message};\n{exc}");
+                }
+            }
+            return null;
         }
 
         /// <summary>
@@ -29,29 +80,9 @@ namespace CodeBlogFitness.BL.Controller {
         public void Save() {
             BinaryFormatter formatter = new BinaryFormatter();
             using (var fs = new FileStream("users.dat", FileMode.OpenOrCreate)) {
-                formatter.Serialize(fs, User);
+                formatter.Serialize(fs, Users);
             }
         }
 
-        /// <summary>
-        /// Load user from file
-        /// </summary>
-        /// <returns></returns>
-        public UserController() {
-            BinaryFormatter formatter = new BinaryFormatter();
-            using (var fs = new FileStream("users.dat", FileMode.Open)) {
-                if (formatter.Deserialize(fs) is User user) {
-                    User = user;
-                }
-                else {
-                    throw new FileLoadException("Cannot load User from this file.", "users.dat");
-                }
-            }
-        }
-
-        public UserController(string userName, string genderName, DateTime birthDate, double weight, double height) {
-            Gender gender = new Gender(genderName);
-            User = new User(userName, gender, birthDate, weight, height);
-        }
     }
 }
