@@ -22,7 +22,8 @@ namespace CodeBlogFitness.BL.Controller.Tests {
             // Act
             eatingController.Add(food, rnd.Next(50, 500));
             // Assert
-            Assert.AreEqual(food.Name, eatingController.Eating.Foods.First().Key.Name);
+            //Assert.AreEqual(food.Name, eatingController.Eating.Foods.First().Key.Name);
+            Assert.AreEqual(food.Name, eatingController.Eating.Foods.Last().Key.Name);
 
         }
     }

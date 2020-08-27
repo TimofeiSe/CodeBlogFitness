@@ -2,7 +2,9 @@
 using CodeBlogFitness.BL.Model;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using System.Resources;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -17,16 +19,19 @@ namespace CodeBlogFitness.CMD {
         }
 
         public Program(string[] args) {
-            Console.WriteLine("Hello, I'm CodeBlogFitness the Application.");
-            Console.Write("Enter user name: ");
+            //var culture = CultureInfo.CurrentCulture;
+            var culture = CultureInfo.InvariantCulture;
+            var resourceManager = new ResourceManager("CodeBlogFitness.CMD.Languages.Messages", typeof(Program).Assembly);
+            Console.WriteLine(resourceManager.GetString("Hello", culture));
+            Console.Write(resourceManager.GetString("Enter user name:", culture));
             string name = Console.ReadLine();
             //TODO: Check user name
 
-            //var userController = new UserController(name, gender, birthDate, weight, height);
             UserController userController = new UserController(name);
             EatingController eatingController = new EatingController(userController.CurrentUser);
+            ExerciseController exerciseController = new ExerciseController(userController.CurrentUser);
             if (userController.IsNewUser) {
-                Console.Write("Enter user gender: ");
+                Console.Write(resourceManager.GetString("Enter user gender:", culture));
                 string gender = Console.ReadLine();
                 DateTime birthDate = EnterDateTimePlease("user birth date (YYYY-mm-dd)");
                 double height = EnterNumberPlease("user height");
@@ -34,18 +39,43 @@ namespace CodeBlogFitness.CMD {
                 userController.SetNewUserData(gender, birthDate, weight, height);
             }
             Console.WriteLine(userController.CurrentUser);
-            Console.WriteLine("What do you want to do?");
-            Console.WriteLine("E - enter eating.");
-            var key = Console.ReadKey();
-            Console.WriteLine();
-            if (key.Key == ConsoleKey.E) {
-                var (food, weight) = EnterEating();
-                eatingController.Add(food, weight);
-
-                foreach (var item in eatingController.Eating.Foods) {
-                    Console.WriteLine($"\t{item.Key} - {item.Value}");
-                }
+            while (true) {
+                Console.WriteLine("What do you want to do?");
+                Console.WriteLine("► A - enter exercise.");
+                Console.WriteLine("► E - enter eating.");
+                Console.WriteLine("► Q - exit.");
+                var key = Console.ReadKey();
+                Console.WriteLine();
+                switch (key.Key) {
+                    case ConsoleKey.E:
+                        var (food, weight) = EnterEating();
+                        eatingController.Add(food, weight);
+                        foreach (var item in eatingController.Eating.Foods) {
+                            Console.WriteLine($"\t{item.Key} - {item.Value}");
+                        }
+                        break;
+                    case ConsoleKey.A:
+                        //var (activity, duration) = EnterExercise();
+                        var exer = EnterExercise();
+                        exerciseController.Add(exer.Activity, DateTime.Now.AddMinutes(-exer.Duration), DateTime.Now);
+                        foreach (var item in exerciseController.Exercises) {
+                            Console.WriteLine($"\t{item.Activity.Name} - {item.Start} .. {item.Finish}");
+                        }
+                        break;
+                    case ConsoleKey.Q:
+                        Environment.Exit(0);
+                        break;
+                } 
             }
+        }
+
+        private (Activity Activity, double Duration) EnterExercise() {
+            Console.WriteLine("Enter activity name: ");
+            string activityName = Console.ReadLine();
+            double caloriesPerMinute = EnterNumberPlease("calories per minute");
+            double duration = EnterNumberPlease("duration");
+            return (Activity: new Activity(activityName, caloriesPerMinute), 
+                Duration: duration);
         }
 
         private (Food, double) EnterEating() {
