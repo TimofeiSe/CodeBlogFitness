@@ -8,33 +8,29 @@ namespace CodeBlogFitness.BL.Model {
 
     [Serializable]
     public class Food {
-        
+
         #region Properties
+        public int Id { get; set; }
         /// <summary>
         /// Food name
         /// </summary>
-        public string Name { get; }
+        public string Name { get; set; }
         /// <summary>
-        /// Proteins per 100 g
+        /// per 1 gram
         /// </summary>
-        public double Proteins { get => ProteinsPerGram * 100.0; }
+        private double Proteins { get; set; }
         /// <summary>
-        /// Fats per 100 g
+        /// per 1 gram
         /// </summary>
-        public double Fats { get => FatsPerGram * 100.0; }
+        private double Fats { get; set; }
         /// <summary>
-        /// Carbohydrates per 100 g
+        /// per 1 gram
         /// </summary>
-        public double Carbohydrates { get => CarbohydratesPerGram * 100.0; }
+        private double Carbohydrates { get; set; }
         /// <summary>
-        /// Calories per 100 g
+        /// per 1 gram
         /// </summary>
-        public double Calories { get => CaloriesPerGram * 100.0; }
-
-        private double ProteinsPerGram { get; }
-        private double FatsPerGram { get; }
-        private double CarbohydratesPerGram { get;  }
-        private double CaloriesPerGram { get; }
+        private double Calories { get; set; }
         #endregion
 
 
@@ -44,10 +40,10 @@ namespace CodeBlogFitness.BL.Model {
 
         public Food(string name, double proteins, double fats, double carbohydrates, double calories) {
             Name = name;
-            ProteinsPerGram = proteins / 100.0;
-            FatsPerGram = fats / 100.0;
-            CarbohydratesPerGram = carbohydrates / 100.0;
-            CaloriesPerGram = calories / 100.0;
+            Proteins = proteins / 100.0;
+            Fats = fats / 100.0;
+            Carbohydrates = carbohydrates / 100.0;
+            Calories = calories / 100.0;
         }
 
         public override string ToString() {

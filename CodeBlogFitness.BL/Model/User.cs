@@ -11,14 +11,16 @@ namespace CodeBlogFitness.BL.Model {
     [Serializable]
     public class User {
         #region Properties
+        public int Id { get; set; }
         /// <summary>
         /// User name
         /// </summary>
-        public string Name { get; }
+        public string Name { get; set; }
         /// <summary>
         /// User gender
         /// </summary>
-        public Gender Gender { get; set; }
+        public int? GenderId { get; set; }
+        public virtual Gender Gender { get; set; }
         /// <summary>
         /// User birth date
         /// </summary>

@@ -10,21 +10,15 @@ namespace CodeBlogFitness.BL.Controller {
 
     public abstract class ControllerBase {
 
+        //protected IDataSaver saver = new SerializeDataSaver();
+        protected IDataSaver saver = new DatabaseDataSaver();
+
         protected void Save(string fileName, object obj) {
-            BinaryFormatter formatter = new BinaryFormatter();
-            using (var fs = new FileStream(fileName, FileMode.OpenOrCreate)) {
-                formatter.Serialize(fs, obj);
-            }
+            saver.Save(fileName, obj);
         }
 
-        protected T Load<T>(string fileName) {
-            BinaryFormatter formatter = new BinaryFormatter();
-            using (var fs = new FileStream(fileName, FileMode.OpenOrCreate)) {
-                if (fs.Length > 0 && formatter.Deserialize(fs) is T t)
-                    return t;
-                else
-                    return default(T);
-            }
+        protected T Load<T>(string fileName) where T : class{
+            return saver.Load<T>(fileName);
         }
     }
 }

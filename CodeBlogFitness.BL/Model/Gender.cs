@@ -11,10 +11,11 @@ namespace CodeBlogFitness.BL.Model {
     /// </summary>
     [Serializable]
     public class Gender {
+        public int Id { get; set; }
         /// <summary>
         /// Gender name
         /// </summary>
-        public string Name { get; }
+        public string Name { get; set; }
         /// <summary>
         /// Constructor
         /// </summary>
